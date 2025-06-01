@@ -1,2 +1,3 @@
-# Kevin-s-UTY-Balatro-Mod
-My Balatro mod adding Jokers based on characters from Undertale Yellow
+# Kevin' s Undertale Yellow
+A Balatro Mod adding 45 Jokers based on the characters from Undertale Yellow
+As well as featuring 10 new challanges
