@@ -294,7 +294,7 @@ SMODS.Joker{
 		end
 		
 		if context.destroying_card and not context.blueprint and not context.retrigger_joker then
-			if #context.full_hand == 1 and G.GAME.current_round.hands_played == 0 and SMODS.has_enhancement(context.other_card, "m_stone") then
+			if #context.full_hand == 1 and G.GAME.current_round.hands_played == 0 and SMODS.has_enhancement(context.full_hand[1], "m_stone") then
 				local sealed = pseudorandom_element(G.hand.cards, pseudoseed('snake_miner'))
 				G.E_MANAGER:add_event(Event({
 					trigger = "before",
