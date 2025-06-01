@@ -1,0 +1,12 @@
+{
+    "title": "Kevin's UTY",
+    "requires-steamodded": true,
+    "requires-talisman": false,
+    "categories": ["Content","Joker"],
+    "author": "SurelyNotClover",
+    "repo": "https://github.com/",
+    "downloadURL": "https://github.com/",
+    "folderName": "KevinsUTY",
+    "version": "1.0.0",
+    "automatic-version-check": true
+  }

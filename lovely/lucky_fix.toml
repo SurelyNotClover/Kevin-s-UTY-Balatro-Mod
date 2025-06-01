@@ -1,0 +1,68 @@
+[manifest]
+version = "1.0.0"
+dump_lua = true
+priority = 0
+
+# this patch fixes lucky cards using a set value instead of a config valueable
+
+[[patches]]
+[patches.pattern]
+target = "card.lua"
+pattern = '''
+if pseudorandom('lucky_mult') < G.GAME.probabilities.normal/5 then
+'''
+position = "at"
+payload = '''
+if pseudorandom('lucky_mult') < G.GAME.probabilities.normal/self.ability.extra.mult_chance then
+'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "card.lua"
+pattern = '''
+if pseudorandom('lucky_money') < G.GAME.probabilities.normal/15 then
+'''
+position = "at"
+payload = '''
+if pseudorandom('lucky_money') < G.GAME.probabilities.normal/self.ability.extra.money_chance then
+'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "game.lua"
+pattern = '''
+m_lucky =   {max = 500, order = 9, name = "Lucky Card", set = "Enhanced", pos = {x=4,y=1}, effect = "Lucky Card", label = "Lucky Card", config = {mult=20, p_dollars = 20}},
+'''
+position = "at"
+payload = '''
+m_lucky =   {max = 500, order = 9, name = "Lucky Card", set = "Enhanced", pos = {x=4,y=1}, effect = "Lucky Card", label = "Lucky Card", config = {mult=20, p_dollars = 20, extra={mult_chance=5, money_chance=15}}},
+'''
+match_indent = true
+
+#i put 2 patches here. one according to source code, other according to lovely dump (the latter works)
+[[patches]]
+[patches.pattern]
+target = "functions/common_events.lua"
+pattern = '''
+elseif _c.effect == 'Lucky Card' then loc_vars = {G.GAME.probabilities.normal, _c.config.mult, 5, _c.config.p_dollars, 15}
+'''
+position = "at"
+payload = '''
+elseif _c.effect == 'Lucky Card' then loc_vars = {G.GAME.probabilities.normal, _c.config.mult, _c.config.extra.mult_chance, _c.config.p_dollars, _c.config.extra.money_chance}
+'''
+match_indent = true
+
+
+[[patches]]
+[patches.pattern]
+target = "functions/common_events.lua"
+pattern = '''
+elseif _c.effect == 'Lucky Card' then loc_vars = {G.GAME.probabilities.normal, cfg.mult, 5, cfg.p_dollars, 15}
+'''
+position = "at"
+payload = '''
+elseif _c.effect == 'Lucky Card' then loc_vars = {G.GAME.probabilities.normal, cfg.mult, cfg.extra.mult_chance, cfg.p_dollars, cfg.extra.money_chance}
+'''
+match_indent = true

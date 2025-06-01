@@ -1,0 +1,18 @@
+{
+    "id": "SNCUTY",
+    "name": "Kevin's UTY",
+    "display_name": "Kevin's UTY",
+    "author": ["SurelyNotClover"],
+    "description": "A UTY Balatro mod",
+    "prefix": "sncuty",
+    "main_file": "kevinsuty.lua",
+    "priority": -5 ,
+    "badge_colour": "e6e600",
+    "badge_text_colour": "ffffff",
+    "dependencies": [
+    	"Steamodded (>=1.0.0~BETA-0323b)",
+        "Lovely (>=0.6)"
+    ],
+    "version": "1.0"
+}
+

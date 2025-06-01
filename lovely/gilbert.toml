@@ -1,0 +1,81 @@
+[manifest]
+version = "1.0.0"
+dump_lua = true
+priority = 0
+
+# this patch makes Gilbert work
+
+# checking if selected card is stone and global flag is true
+# before the check for selection limit
+# and adding selection limit
+[[patches]]
+[patches.pattern]
+target = "cardarea.lua"
+pattern = '''
+if #self.highlighted >= self.config.highlighted_limit then
+        card:highlight(false)
+    else
+'''
+position = "at"
+payload = '''
+if card.ability.effect == 'Stone Card' and G.GAME.stones_ignore_selection then
+    card.stone_increase = true
+    self.highlighted[#self.highlighted+1] = card
+    self.config.highlighted_limit = self.config.highlighted_limit + 1
+    card:highlight(true)
+    if not silent then play_sound('cardSlide1') end
+elseif #self.highlighted >= self.config.highlighted_limit then
+    card:highlight(false)
+else
+'''
+match_indent = true
+
+# deducting selection limit if deselected card was used to increase it
+[[patches]]
+[patches.pattern]
+target = "cardarea.lua"
+pattern = '''
+    if self.highlighted[i] == card then
+                table.remove(self.highlighted, i)
+                break
+            end
+        end
+'''
+position = "after"
+payload = '''
+if card.stone_increase then
+    self.config.highlighted_limit = self.config.highlighted_limit - 1
+    card.stone_increase = false
+end
+'''
+match_indent = true
+
+# ditto for deselecting all cards
+[[patches]]
+[patches.pattern]
+target = "cardarea.lua"
+pattern = '''
+    if self.highlighted[i].ability.forced_selection and self == G.hand then
+        else
+'''
+position = "after"
+payload = '''
+if self.highlighted[i].stone_increase then
+    self.config.highlighted_limit = self.config.highlighted_limit - 1
+    self.highlighted[i].stone_increase = false
+end
+'''
+match_indent = true
+
+# removing the stupid play limit
+[[patches]]
+[patches.pattern]
+target = "functions/button_callbacks.lua"
+pattern = '''
+    if #G.hand.highlighted <= 0 or G.GAME.blind.block_play or #G.hand.highlighted > 5 then
+'''
+position = "at"
+payload = '''
+    if #G.hand.highlighted <= 0 or G.GAME.blind.block_play then
+'''
+match_indent = true
