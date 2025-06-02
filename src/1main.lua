@@ -145,7 +145,7 @@ if KEVINSUTY.config_file.unjank_flowey then
 		end,
 		
 		calculate = function(self, card, context)
-			if context.setting_blind then
+			if context.setting_blind and not context.blueprint then
 				local generation = 0
 				if #G.GAME.jokers_sold <= 3 then
 					generation = #G.GAME.jokers_sold
