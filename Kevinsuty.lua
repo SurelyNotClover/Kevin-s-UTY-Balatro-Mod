@@ -332,7 +332,7 @@ end
 
 0 - top-priority:
 unjank flowey (specifically context.repetition (only triggering message) and context.individual (triggering before the card)) (soft fix in a form of an old Flowey)
-release the mod
+change Ace (XMult per ace drawn instead not played)
 
 0 - mid-priority:
 fix Pedla soft-locking if retriggered too much (fixed?)
