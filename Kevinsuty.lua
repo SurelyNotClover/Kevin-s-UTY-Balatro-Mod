@@ -332,6 +332,7 @@ end
 
 0 - top-priority:
 unjank flowey (specifically context.repetition (only triggering message) and context.individual (triggering before the card)) (soft fix in a form of an old Flowey)
+new idea: retrigger all 7s (played or not)
 change Ace (XMult per ace drawn instead not played)
 
 0 - mid-priority:
