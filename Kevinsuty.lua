@@ -331,6 +331,7 @@ end
 -----TODO:----- 
 
 0 - top-priority:
+change mo (lower values)
 buff slurpy (lower values)
 update the self-ship challenge (add no_planets rule, maybe)
 unjank flowey (specifically context.repetition (only triggering message) and context.individual (triggering before the card)) (soft fix in a form of an old Flowey)
