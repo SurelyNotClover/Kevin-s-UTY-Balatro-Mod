@@ -3,7 +3,7 @@ version = "1.0.0"
 dump_lua = true
 priority = 0
 
-# this patch fixes lucky cards using a set value instead of a config valueable
+# this patch fixes lucky cards using a set value instead of a config variable
 
 [[patches]]
 [patches.pattern]
