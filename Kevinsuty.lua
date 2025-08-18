@@ -331,6 +331,7 @@ end
 -----TODO:----- 
 
 0 - top-priority:
+buff money partner (lower cost)
 change mo (lower values)
 buff slurpy (lower values)
 update the self-ship challenge (add no_planets rule, maybe)
