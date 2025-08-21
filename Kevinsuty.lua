@@ -331,6 +331,7 @@ end
 -----TODO:----- 
 
 0 - top-priority:
+new joker: hermit - gain a portion of your bank (1/4? 1/3?) when using hermit tarot card
 buff money partner (lower cost)
 change mo (lower values)
 buff slurpy (lower values)
