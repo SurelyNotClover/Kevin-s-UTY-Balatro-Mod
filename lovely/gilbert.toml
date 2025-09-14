@@ -72,7 +72,7 @@ match_indent = true
 [patches.pattern]
 target = "functions/button_callbacks.lua"
 pattern = '''
-    if #G.hand.highlighted <= 0 or G.GAME.blind.block_play or #G.hand.highlighted > 5 then
+    if #G.hand.highlighted <= 0 or G.GAME.blind.block_play or #G.hand.highlighted > math.max(G.GAME.starting_params.play_limit, 1) then 
 '''
 position = "at"
 payload = '''

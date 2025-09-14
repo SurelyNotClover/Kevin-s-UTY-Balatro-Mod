@@ -78,7 +78,10 @@ SMODS.current_mod.extra_tabs = function()
                                 {n=G.UIT.T, config={text = 'Balatro Modding Discord', scale = text_scale*0.75, colour = G.C.UI.TEXT_LIGHT, shadow = true}},
                             }},
 							{n=G.UIT.R, config={align = "cm", padding = 0}, nodes={
-                                {n=G.UIT.T, config={text = 'Friends Of Kevin Skins:', scale = text_scale*0.6, colour = G.C.UI.TEXT_DARK, shadow = true}},
+                                {n=G.UIT.T, config={text = 'Playtesting:', scale = text_scale*0.6, colour = G.C.UI.TEXT_DARK, shadow = true}},
+                            }},
+							{n=G.UIT.R, config={align = "cm", padding = 0}, nodes={
+                                {n=G.UIT.T, config={text = 'TheUnseenExplosion', scale = text_scale*0.75, colour = G.C.UI.TEXT_LIGHT, shadow = true}},
                             }},
                         }},
                     }},
@@ -102,12 +105,9 @@ assert(SMODS.load_file('src/2ruins.lua'))()
 assert(SMODS.load_file('src/3snowdin.lua'))()
 assert(SMODS.load_file('src/4dunes.lua'))()
 assert(SMODS.load_file('src/5steamworks.lua'))()
+assert(SMODS.load_file('src/6other.lua'))()
 assert(SMODS.load_file('src/challenges.lua'))()
 assert(SMODS.load_file('src/7kevin.lua'))()
-
-if KEVINSUTY.config_file.kevin_self_insert then
-	
-end
 
 -- Loading Sprites
 
@@ -143,6 +143,20 @@ SMODS.Atlas{
 SMODS.Atlas{
 	key = 'Steamworks',
 	path = '5Steamworks.png',
+	px = 71,
+	py = 95
+}
+
+SMODS.Atlas{
+	key = 'Ribbit',
+	path = 'Ribbit.png',
+	px = 90,
+	py = 183
+}
+
+SMODS.Atlas{
+	key = 'Other',
+	path = '6Other.png',
 	px = 71,
 	py = 95
 }
@@ -323,30 +337,58 @@ function Game:init_game_object()
 	g.extra_pack_size = 0
 	g.stones_ignore_selection = false
 	g.uty_heist = false
+	g.next_blind_increase = 0
+	g.mart_in_play = false
 	return g
 end
 
 --[[
 
+--CHANGE LOG--
+
+balance
+
+- tweaked mo (-10$ -> -6$, +15$ -> +10$)
+- reworked ace (X0.25 Mult for every ace drawn this round)
+- buffed the selfship challenge (Added "No Planets" rule)
+- buffed slurpy (lower values)
+- buffed crispy scroll (X2 overkill -> X1.5 overkill)
+- buffed honeydew (6 chips -> 8 chips)
+- nerfed trihecta (15 chips -> 10 chips)
+- nerfed mantabot (3 Mult -> 2 Mult)
+
+additions
+
+- added hermit
+- added guardener
+- added micro, macro and giga froggit
+- added bits & bites
+- added cardmaster
+- added gerson
+- added rorrim
+- added sandra
+
+other
+
+- took off kevin's beanie
+- rewritten martlet
+
 -----TODO:----- 
 
 0 - top-priority:
-new joker: hermit - gain a portion of your bank (1/4? 1/3?) when using hermit tarot card
-buff money partner (lower cost)
-change mo (lower values)
-buff slurpy (lower values)
-update the self-ship challenge (add no_planets rule, maybe)
+investigate multiplayer calculator compatibility (https://www.twitch.tv/videos/2564357377?t=2h59m16s)
+finish martlet (done?)
 unjank flowey (specifically context.repetition (only triggering message) and context.individual (triggering before the card)) (soft fix in a form of an old Flowey)
-new idea: retrigger all 7s (played or not)
-change Ace (XMult per ace drawn instead not played)
 
 0 - mid-priority:
+make a dark theme
+(later) make equipment consumables (infinite uses, cooldown, and take up a slot)
+see why rorrim makes old blueprint from cryptid use 'in blind' label
 fix Pedla soft-locking if retriggered too much (fixed?)
-ask around for people willing to contribute to 'friends of kevin'
-figure out malverk
 
 0 - low-priority:
 redraw Jandroid, Penilla
+redraw backgrounds Honey, Blackjack
 add JokerDisplay compatibility for Pops
 
 ]]

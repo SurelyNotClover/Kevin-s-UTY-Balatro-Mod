@@ -3,7 +3,7 @@ version = "1.0.0"
 dump_lua = true
 priority = 0
 
-# this patch adds an cardarea used for (Jank) Flowey
+# this patch adds an cardarea used for Flowey
 
 [[patches]]
 [patches.pattern]

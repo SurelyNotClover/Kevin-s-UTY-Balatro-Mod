@@ -9,7 +9,7 @@ priority = 0
 [patches.pattern]
 target = "card.lua"
 pattern = '''
-local _size = self.ability.extra
+local _size = math.max(1, self.ability.extra + (G.GAME.modifiers.booster_size_mod or 0))
 '''
 position = "after"
 payload = '''

@@ -26,13 +26,22 @@ SMODS.Joker{
 	soul_pos = { x = 1, y = 0 },
 	config = {
 		extra={
-			repetitions = 1
+			repetitions = 1,
+			frame = 0
 		},
 	},
 	loc_vars = function(self,info_queue,center)
         return {vars = { } }
 	end,
-	
+
+	update = function(self, card, dt)
+		card.ability.extra.frame = card.ability.extra.frame + dt
+		card.children.floating_sprite:set_sprite_pos({x = 1 + math.floor(card.ability.extra.frame), y = 0})
+		if card.ability.extra.frame > 7 then
+			card.ability.extra.frame = 0
+		end
+	end,
+
 	calculate = function(self, card, context)
 		
 		if context.retrigger_joker_check and not context.retrigger_joker and not context.blueprint
@@ -40,7 +49,8 @@ SMODS.Joker{
 		and not string.find(context.other_card.config.center.key, "blackjack")
 		and not string.find(context.other_card.config.center.key, "martlet")
 		and not string.find(context.other_card.config.center.key, "chujin")
-		and not string.find(context.other_card.config.center.key, "mostand") then
+		and not string.find(context.other_card.config.center.key, "mostand")
+		and not string.find(context.other_card.config.center.key, "bits_n_bites") then
 			if context.other_card.config.center.key ~= "j_sncuty_honeydew" then
 				return {
 					message = 'Again!',
@@ -63,7 +73,8 @@ SMODS.Challenge({
 	loc_txt = { name = 'Date Night' },
 	rules = {
 		custom = {
-			{id = 'no_shop_jokers'}
+			{id = 'no_shop_jokers'},
+			{id = 'no_planets'},
 		},
 		modifiers = {
             { id = 'joker_slots', value = 2 }
@@ -89,6 +100,9 @@ SMODS.Challenge({
             {id = 'p_buffoon_normal_1', ids = {
                 'p_buffoon_normal_1','p_buffoon_normal_2','p_buffoon_jumbo_1','p_buffoon_mega_1',
             }},
+			{id = 'p_celestial_normal_1', ids = {
+                'p_celestial_normal_1','p_celestial_normal_2','p_celestial_normal_3','p_celestial_normal_4','p_celestial_jumbo_1','p_celestial_jumbo_2','p_celestial_mega_1','p_celestial_mega_2',
+            }},
 		},
 		banned_tags = {
 			{id = 'tag_rare'},
@@ -98,6 +112,7 @@ SMODS.Challenge({
             {id = 'tag_negative'},
             {id = 'tag_foil'},
             {id = 'tag_buffoon'},
+			{id = 'tag_meteor'},
             {id = 'tag_top_up'},
 		},
 		banned_other = {

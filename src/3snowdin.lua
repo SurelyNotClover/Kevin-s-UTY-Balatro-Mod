@@ -24,8 +24,8 @@ SMODS.Joker{
 	pos = {x = 0, y = 0},
 	config = {
 		extra = {
-			sell_req = 10,
-			sells_left = 10
+			sell_req = 8,
+			sells_left = 8
 		},
 	},
 	loc_vars = function(self,info_queue,card)
@@ -118,8 +118,8 @@ SMODS.Joker{
 	pos = {x = 1, y = 0},
 	config = {
 		extra = {
-			unscore_req = 20,
-			unscores_left = 20
+			unscore_req = 15,
+			unscores_left = 15
 		},
 	},
 	loc_vars = function(self,info_queue,card)
@@ -309,8 +309,8 @@ SMODS.Joker{
 	pos = {x = 3, y = 0},
 	config = {
 		extra = {
-			destroy_req = 10,
-			destroys_left = 10
+			destroy_req = 8,
+			destroys_left = 8
 		},
 	},
 	loc_vars = function(self,info_queue,card)
@@ -388,7 +388,7 @@ SMODS.Joker{
 		name = 'Matches',
 		text = {
 			'{C:dark_edition}+1{} Joker slot',
-			'After playing a {C:tarot}Secret Hand{} {C:attention}#1# {C:inactive}(#2#){} times,',
+			'After playing a {C:tarot}Secret Hand{}',
 			'turn into {C:attention}Lakewarm Coffee{}',
 			'{C:inactive}(4/5){}'
 		}
@@ -404,8 +404,7 @@ SMODS.Joker{
 	pos = {x = 4, y = 0},
 	config = {
 		extra = {
-			play_req = 3,
-			plays_left = 3
+		
 		},
 	},
 	loc_vars = function(self,info_queue,card)
@@ -417,50 +416,43 @@ SMODS.Joker{
 	
 	calculate = function(self, card, context)
 		if context.before and played_secret_hand(context.poker_hands)then
-			card.ability.extra.plays_left = card.ability.extra.plays_left - 1
-			if card.ability.extra.plays_left >= 1 then
-				return {
-					message = card.ability.extra.plays_left .. '/' .. card.ability.extra.play_req
-				}
-			else
-				G.E_MANAGER:add_event(Event({
-					func = function()
-						play_sound("tarot1")
-						card:juice_up(0.3, 0.5)
-						card:flip()
-						return true
-					end,
-					}))
-					
-					G.E_MANAGER:add_event(Event({
-						trigger = "after",
-						delay = 0.1,
-						func = function()
-							if card then
-								card:set_ability('j_sncuty_lakewarm_coffee')
-							end
-						return true
-					end,
-					}))
-					
-					delay(0.5)
-					
-					G.E_MANAGER:add_event(Event({
-						trigger = "after",
-						delay = 0.2,
-						func = function()
-							play_sound("tarot2")
-							card:set_cost()
-							card:flip()
-						return true
-					end,
-					}))
-					
-					delay(0.25)
-
-					SMODS.calculate_effect({ message = "Lifesaver!"}, card)
+			G.E_MANAGER:add_event(Event({
+				func = function()
+					play_sound("tarot1")
+					card:juice_up(0.3, 0.5)
+					card:flip()
+					return true
+				end,
+				}))
 				
-			end
+				G.E_MANAGER:add_event(Event({
+					trigger = "after",
+					delay = 0.1,
+					func = function()
+						if card then
+							card:set_ability('j_sncuty_lakewarm_coffee')
+						end
+					return true
+				end,
+				}))
+				
+				delay(0.5)
+				
+				G.E_MANAGER:add_event(Event({
+					trigger = "after",
+					delay = 0.2,
+					func = function()
+						play_sound("tarot2")
+						card:set_cost()
+						card:flip()
+					return true
+				end,
+				}))
+				
+				delay(0.25)
+	
+				SMODS.calculate_effect({ message = "Lifesaver!"}, card)
+				
 		end
 	end,
 
@@ -607,7 +599,7 @@ SMODS.Joker{
 	loc_txt = {
 		name = 'Mo',
 		text = {
-		'Lose {C:money}$#1#{} at end of round',	
+		'Lose {C:money}$#1#{} at end of round',
 		'After {C:attention}3{} {C:inactive}(#2#){} rounds, turn into',
 		'{C:attention}Mo Stand{} at the end of {C:attention}Shop{}'
 		}
@@ -624,7 +616,7 @@ SMODS.Joker{
 	pos = {x = 2, y = 1},
 	config = {
 		extra={
-		money_loss = 10,
+		money_loss = 6,
 		rounds_left = 3
 		},
 	},
@@ -731,7 +723,7 @@ SMODS.Joker{
 	pos = {x = 3, y = 1},
 	config = {
 		extra={
-		money_gain = 15
+		money_gain = 10
 		},
 	},
 	loc_vars = function(self,info_queue,card)
@@ -784,7 +776,7 @@ SMODS.Joker{
 	config = {
 		extra={
 		chips = 0,
-		chip_gain = 15
+		chip_gain = 10
 		},
 	},
 	loc_vars = function(self,info_queue,card)
@@ -939,7 +931,7 @@ SMODS.Joker{
 	config = {
 		extra = {
 		chips = 0,
-		chip_gain = 6,
+		chip_gain = 8,
 		},
 	},
 	loc_vars = function(self,info_queue,card)

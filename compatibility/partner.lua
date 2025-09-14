@@ -109,7 +109,7 @@ Partner_API.Partner{
     config = {
         extra = {
             related_card = "j_sncuty_mostand",
-            cost = 4
+            cost = 3
         }
     },
     loc_vars = function(self, info_queue, card)

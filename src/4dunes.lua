@@ -1,6 +1,74 @@
 
 -- Dunes Characters
 
+SMODS.Joker{
+	key = 'gerson',
+	loc_txt = {
+		name = 'Gerson',
+		text = {
+		'{C:attention}Copies{} itself when sold,',
+		'creates a {C:dark_edition}Negative{} {C:spectral}Spectral{} card and raises',
+		'the next blind {C:attention}requirement{} by {X:tarot,C:white}X#1#{}',
+		"{C:inactive}(Does not copy during a blind)",
+		'{C:inactive}(Currently {X:tarot,C:white}X#2#{C:inactive} requirement)'
+		}
+	},
+	atlas = 'Dunes',
+	rarity = 2,
+	cost = 6,
+	unlocked = true,
+	discovered = true,
+	blueprint_compat = false,
+	eternal_compat = true,
+	perishable_compat = true,
+	pos = {x = 0, y = 0},
+	config = {
+		extra = {
+			blind_increase = 0.5
+		},
+	},
+	loc_vars = function(self,info_queue,card)
+        return {vars = { card.ability.extra.blind_increase, 1 + G.GAME.next_blind_increase} }
+	end,
+	add_to_deck = function(self, card, from_debuff)
+		card.sell_cost = 0
+	end,
+	calculate = function(self, card, context)
+		if context.selling_self and not context.blueprint then
+			if not G.GAME.blind.in_blind == true then
+				if not context.retrigger_joker then
+					G.GAME.next_blind_increase = G.GAME.next_blind_increase + card.ability.extra.blind_increase
+					SMODS.add_card({set = "Joker", key = 'j_sncuty_gerson'})
+				end
+				SMODS.add_card({set = 'Spectral', area = G.consumeables, edition = "e_negative"})
+			else
+				G.GAME.next_blind_increase = 0
+			end
+			return {
+				message = "I'm Sold!",
+				colour = G.C.MONEY
+			}
+		end
+		if context.setting_blind and G.GAME.next_blind_increase > 0 and not (context.blueprint or context.retrigger_joker) then
+			G.E_MANAGER:add_event(Event({
+				trigger = 'after',
+				delay = 1,
+				func = function()
+					G.GAME.blind.chips = math.floor(G.GAME.blind.chips * (1 + G.GAME.next_blind_increase))
+					G.GAME.blind.chip_text = number_format(G.GAME.blind.chips)
+
+					local chips_UI = G.hand_text_area.blind_chips
+					G.FUNCS.blind_chip_UI_scale(G.hand_text_area.blind_chips)
+					G.HUD_blind:recalculate()
+					chips_UI:juice_up()
+					
+					SMODS.calculate_effect({ message = {"I'm Old!"}, sound = "xchips", colour = G.C.CHIPS }, card)
+					G.GAME.next_blind_increase = 0
+			return true end }))
+		end
+	end
+}
+
 -- Dunebud is_suit hook
 
 local orig_is_suit = Card.is_suit
@@ -31,7 +99,7 @@ SMODS.Joker{
 	blueprint_compat = false,
 	eternal_compat = true,
 	perishable_compat = true,
-	pos = {x = 0, y = 0},
+	pos = {x = 1, y = 0},
 	loc_vars = function(self,info_queue,card)
 		info_queue[#info_queue+1] = G.P_CENTERS.m_stone
         return {vars = { } }
@@ -56,8 +124,8 @@ SMODS.Joker{
 	blueprint_compat = true,
 	eternal_compat = true,
 	perishable_compat = true,
-	pixel_size = {  h = 69 },
-	pos = {x = 1, y = 0},
+	pixel_size = { h = 69 },
+	pos = {x = 2, y = 0},
 	config = {
 		extra = {
 			xmult = 10
@@ -121,7 +189,7 @@ SMODS.Joker{
 	blueprint_compat = true,
 	eternal_compat = true,
 	perishable_compat = true,
-	pos = {x = 2, y = 0},
+	pos = {x = 3, y = 0},
 	config = {
 		extra = {
 			mult = 5
@@ -159,7 +227,7 @@ SMODS.Joker{
 	eternal_compat = true,
 	perishable_compat = true,
 	pixel_size = { w = 51},
-	pos = {x = 3, y = 0},
+	pos = {x = 4, y = 0},
 	config = {
 		extra = {
 			chance = 4,
@@ -198,7 +266,7 @@ SMODS.Joker{
 	blueprint_compat = true,
 	eternal_compat = true,
 	perishable_compat = true,
-	pos = {x = 4, y = 0},
+	pos = {x = 0, y = 1},
 	config = {
 		extra = {
 			repetitions = 1
@@ -236,7 +304,7 @@ SMODS.Joker{
 	blueprint_compat = false,
 	eternal_compat = true,
 	perishable_compat = true,
-	pos = {x = 0, y = 1},
+	pos = {x = 1, y = 1},
 	config = {
 		extra = {
 			
@@ -277,7 +345,7 @@ SMODS.Joker{
 	blueprint_compat = false,
 	eternal_compat = true,
 	perishable_compat = true,
-	pos = {x = 1, y = 1},
+	pos = {x = 2, y = 1},
 	config = {
 		extra = {
 			
@@ -294,7 +362,7 @@ SMODS.Joker{
 		end
 		
 		if context.destroying_card and not context.blueprint and not context.retrigger_joker then
-			if #context.full_hand == 1 and G.GAME.current_round.hands_played == 0 and SMODS.has_enhancement(context.full_hand[1], "m_stone") then
+			if #context.full_hand == 1 and G.GAME.current_round.hands_played == 0 and --[[context.full_hand[1].config.center.key == 'm_stone']] SMODS.has_enhancement(context.full_hand[1], "m_stone") then
 				local sealed = pseudorandom_element(G.hand.cards, pseudoseed('snake_miner'))
 				G.E_MANAGER:add_event(Event({
 					trigger = "before",
@@ -337,7 +405,7 @@ SMODS.Joker{
 	blueprint_compat = false,
 	eternal_compat = true,
 	perishable_compat = true,
-	pos = {x = 2, y = 1},
+	pos = {x = 3, y = 1},
 	config = {
 		extra = {
 			booster_slots = 1
@@ -383,7 +451,7 @@ SMODS.Joker{
 	blueprint_compat = true,
 	eternal_compat = true,
 	perishable_compat = true,
-	pos = {x = 3, y = 1},
+	pos = {x = 4, y = 1},
 	config = {
 		extra={
 			xmult = 1.2
@@ -421,7 +489,7 @@ SMODS.Joker{
 	blueprint_compat = true,
 	eternal_compat = true,
 	perishable_compat = true,
-	pos = {x = 4, y = 1},
+	pos = {x = 0, y = 2},
 	config = {
 		extra = {
 			tarot_chance = 4
@@ -476,7 +544,7 @@ SMODS.Joker{
 	blueprint_compat = true,
 	eternal_compat = true,
 	perishable_compat = true,
-	pos = {x = 0, y = 2},
+	pos = {x = 1, y = 2},
 	config = {
 		extra = {
 			repetitions = 1
@@ -502,6 +570,66 @@ SMODS.Joker{
 }
 
 SMODS.Joker{
+	key = 'sandra',
+	loc_txt = {
+		name = 'Sandra',
+		text = {
+		'If {C:attention}Blind{} was beaten without using',
+		'Discards, {C:mult}+#1#{} Discards next round',
+		'If {C:attention}Blind{} was beaten in {C:attention}1{} Hand,',
+		'{C:chips}+#2#{} Hand next round',
+		'{C:inactive}(Currently: {C:mult}#3#{C:inactive}; {C:chips}#4#{C:inactive})'
+		}
+	},
+	atlas = 'Dunes',
+	rarity = 2,
+	cost = 6,
+	unlocked = true,
+	discovered = true,
+	blueprint_compat = false,
+	eternal_compat = true,
+	perishable_compat = true,
+	pos = {x = 2, y = 2},
+	config = {
+		extra = {
+			extra_discards = 2,
+			extra_hands = 1,
+			discard_bonus = false,
+			hand_bonus = false
+		},
+	},
+	loc_vars = function(self,info_queue,card)
+        return {vars = { card.ability.extra.extra_discards, card.ability.extra.extra_hands, (card.ability.extra.discard_bonus and "Active") or 'Inactive', (card.ability.extra.hand_bonus and "Active") or 'Inactive' } }
+	end,
+	calculate = function(self, card, context)
+		if context.end_of_round and context.cardarea == G.jokers and context.main_eval and not (context.blueprint or context.retrigger_joker) then
+			if G.GAME.current_round.hands_played == 1 then
+				card.ability.extra.hand_bonus = true
+				SMODS.calculate_effect({message = 'Recycling!'}, card)
+			end
+			if G.GAME.current_round.discards_used == 0 then
+				card.ability.extra.discard_bonus = true
+				if not G.GAME.current_round.hands_played == 1 then
+					SMODS.calculate_effect({message = 'Recycling!'}, card)
+				end
+			end
+		end
+		if context.setting_blind then
+			if card.ability.extra.hand_bonus then
+				ease_hands_played(card.ability.extra.extra_hands)
+				card.ability.extra.hand_bonus = false
+				SMODS.calculate_effect({message = '+'..card.ability.extra.extra_hands..' Hand', colour = G.C.CHIPS}, card)
+			end
+			if card.ability.extra.discard_bonus then
+				ease_discard(card.ability.extra.extra_discards)
+				card.ability.extra.discard_bonus = false
+				SMODS.calculate_effect({message = '+'..card.ability.extra.extra_discards..' Discards', colour = G.C.MULT}, card)
+			end
+		end
+	end,
+}
+
+SMODS.Joker{
 	key = 'byte',
 	loc_txt = {
 		name = 'Byte',
@@ -518,7 +646,7 @@ SMODS.Joker{
 	blueprint_compat = false,
 	eternal_compat = true,
 	perishable_compat = true,
-	pos = {x = 1, y = 2},
+	pos = {x = 3, y = 2},
 	config = {
 		extra = {
 			pack_size = 1
@@ -566,7 +694,7 @@ SMODS.Joker{
 	blueprint_compat = true,
 	eternal_compat = true,
 	perishable_compat = true,
-	pos = {x = 2, y = 2},
+	pos = {x = 4, y = 2},
 	config = {
 		extra = {
 			copy_chance = 4,
@@ -628,7 +756,7 @@ SMODS.Joker{
 	blueprint_compat = false,
 	eternal_compat = false,
 	perishable_compat = true,
-	pos = {x = 3, y = 2},
+	pos = {x = 0, y = 3},
 	config = {
 		extra = {
 		rounds_played = 0
@@ -698,8 +826,8 @@ SMODS.Joker{
 	loc_txt = {
 		name = 'Ace',
 		text = {
-		'{X:mult,C:white}X#1#{} Mult for every {C:attention}Ace{}',
-		'in {C:attention}hand{} and {C:attention}deck{}',
+		'Gains {X:mult,C:white}X#1#{} Mult for every {C:attention}Ace{}',
+		'drawn to {C:attention}hand{} this round',
 		'{C:inactive}(Currently {X:mult,C:white}X#2#{C:inactive} Mult)'
 		}
 	},
@@ -711,7 +839,7 @@ SMODS.Joker{
 	blueprint_compat = true,
 	eternal_compat = true,
 	perishable_compat = true,
-	pos = {x = 4, y = 2},
+	pos = {x = 1, y = 3},
 	config = {
 		extra = {
 			xmult_ace = 0.25,
@@ -719,39 +847,32 @@ SMODS.Joker{
 		},
 	},
 	loc_vars = function(self,info_queue,card)
-		local aces = {}
-		if G.deck and G.deck.cards then
-			for k, v in pairs(G.deck.cards) do
-				if v:get_id() == 14 then
-					table.insert(aces, v)
-				end
-			end
-		end
-		if G.hand and G.hand.cards then
-			for k, v in pairs(G.hand.cards) do
-				if v:get_id() == 14 then
-					table.insert(aces, v)
-				end
-			end
-		end
-        return {vars = { card.ability.extra.xmult_ace, card.ability.extra.xmult + (#aces * card.ability.extra.xmult_ace) } }
+        return {vars = { card.ability.extra.xmult_ace, card.ability.extra.xmult } }
     end,
 	calculate = function(self, card, context)
-		if context.joker_main then
-			local aces = {}
-			for k, v in pairs(G.deck.cards) do
-				if v:get_id() == 14 then
-					table.insert(aces, v)
+		if context.hand_drawn and not context.blueprint then
+			local found_aces = 0
+			for i = 1, #SMODS.drawn_cards do
+				if SMODS.drawn_cards[i]:get_id() == 14 then
+					found_aces = found_aces + 1
 				end
 			end
-			for k, v in pairs(G.hand.cards) do
-				if v:get_id() == 14 then
-					table.insert(aces, v)
-				end
+			if found_aces > 0 then
+				card.ability.extra.xmult = card.ability.extra.xmult + (found_aces * card.ability.extra.xmult_ace)
+				return {
+					message = 'X'.. card.ability.extra.xmult ..' Mult',
+					colour = G.C.MULT
+				}
 			end
+		end
+		if context.joker_main and card.ability.extra.xmult > 1 then
 			return{
-				xmult = card.ability.extra.xmult + (#aces * card.ability.extra.xmult_ace)
+				xmult = card.ability.extra.xmult
 			}
+		end
+		if context.end_of_round and not context.blueprint and not context.retrigger_joker and card.ability.extra.xmult > 1 then
+			card.ability.extra.xmult = 1
+			SMODS.calculate_effect({message = 'Reset', colour = G.C.MULT}, card)
 		end
 	end,
 }
@@ -785,7 +906,7 @@ SMODS.Joker{
 	blueprint_compat = false,
 	eternal_compat = false,
 	perishable_compat = true,
-	pos = {x = 0, y = 3},
+	pos = {x = 2, y = 3},
 	config = {
 		extra = {
 			chance = 10,
@@ -881,7 +1002,7 @@ SMODS.Joker{
 	eternal_compat = true,
 	perishable_compat = true,
 	display_size = { w = 71 * 1.15, h = 95 * 1.15 },
-	pos = {x = 1, y = 3},
+	pos = {x = 3, y = 3},
 	config = {
 		extra = {
 			xmult = 4,
@@ -926,7 +1047,7 @@ SMODS.Joker{
 	blueprint_compat = false,
 	eternal_compat = true,
 	perishable_compat = false,
-	pos = {x = 2, y = 3},
+	pos = {x = 4, y = 3},
 	config = {
 		extra = {
 			money_gain = 1,
@@ -987,6 +1108,43 @@ SMODS.Joker{
 }
 
 SMODS.Joker{
+	key = 'cardmaster',
+	loc_txt = {
+		name = 'Cardmaster',
+		text = {
+		'Retrigger all {C:attention}7s{}'
+		}
+	},
+	atlas = 'Dunes',
+	rarity = 2,
+	cost = 6,
+	unlocked = true,
+	discovered = true,
+	blueprint_compat = true,
+	eternal_compat = true,
+	perishable_compat = true,
+	pos = {x = 0, y = 4},
+	config = {
+		extra = {
+			repetitions = 1
+		},
+	},
+	loc_vars = function(self,info_queue,card)
+        return {vars = {  } }
+    end,
+	calculate = function(self, card, context)
+		if context.repetition and context.other_card:get_id() == 7 then
+			return {
+				message = 'Again!',
+				repetitions = card.ability.extra.repetitions,
+				message_card = context.other_card,
+				juice_card = card
+			}
+		end
+	end
+}
+
+SMODS.Joker{
 	key = 'blackjack',
 	loc_txt = {
 		name = 'Blackjack',
@@ -1004,7 +1162,7 @@ SMODS.Joker{
 	blueprint_compat = false,
 	eternal_compat = true,
 	perishable_compat = true,
-	pos = {x = 3, y = 3},
+	pos = {x = 1, y = 4},
 	config = {
 		extra = {
 		money_loss = 2,

@@ -52,6 +52,72 @@ SMODS.Joker{
 	end
 }
 
+function copy_effect(copier, copied_card, context)
+	if not copied_card or copied_card == copier then return end
+    local old_context_blueprint_card = context.blueprint_card
+    context.blueprint_card = context.blueprint_card or copier
+    local eff_card = context.blueprint_card
+    local other_joker_ret = copied_card:calculate_joker(context)
+    context.blueprint_card = old_context_blueprint_card
+    if other_joker_ret then
+        other_joker_ret.card = eff_card
+        return other_joker_ret
+    end
+end
+
+SMODS.Joker{
+	key = 'rorrim',
+	loc_txt = {
+		name = 'Rorrim',
+		text = {
+		'Copies ability of',
+		'{C:attention}Joker{} to the right',
+		'while not in {C:attention}blind{}'
+		}
+	},
+	atlas = 'Ruins',
+	rarity = 2,
+	cost = 7,
+	unlocked = true,
+	discovered = true,
+	blueprint_compat = true,
+	eternal_compat = true,
+	perishable_compat = true,
+	pos = {x = 1, y = 0},
+	config = {
+		extra = {
+
+		},
+	},
+	loc_vars = function(self, info_queue, card)
+		main_end = (card.area and card.area == G.jokers) and {
+			{
+				n = G.UIT.C,
+				config = { align = "bm", minh = 0.4 },
+				nodes = {
+					{
+						n = G.UIT.C,
+						config = { ref_table = card, align = "m", colour = (not G.GAME.blind.in_blind and mix_colours(G.C.GREEN, G.C.JOKER_GREY, 0.8)) or (G.GAME.blind.in_blind and mix_colours(G.C.RED, G.C.JOKER_GREY, 0.8)), r = 0.05, padding = 0.06},
+						nodes = {
+							{ n = G.UIT.T, config = { text = ' ' .. ((G.GAME.blind.in_blind and 'in blind') or (not G.GAME.blind.in_blind and 'not in blind')) .. ' ', colour = G.C.UI.TEXT_LIGHT, scale = 0.32 * 0.8 } },
+						}
+					}
+				}
+			}
+		} or nil
+		return { main_end = main_end }
+    end,
+    calculate = function(self, card, context)
+        local other_joker = nil
+        for i = 1, #G.jokers.cards do
+            if G.jokers.cards[i] == card then other_joker = G.jokers.cards[i + 1] end
+        end
+        if not G.GAME.blind.in_blind then
+			return copy_effect(card, other_joker, context)
+		end
+    end,
+}
+
 SMODS.Joker{
 	key = 'crispy_cards',
 	loc_txt = {
@@ -108,11 +174,11 @@ SMODS.Joker{
 	blueprint_compat = true,
 	eternal_compat = true,
 	perishable_compat = true,
-	soul_pos = {x = 1, y = 1},
-	pos = {x = 1, y = 0},
+	soul_pos = {x = 2, y = 1},
+	pos = {x = 2, y = 0},
 	config = {
 		extra = {
-			overkill_req = 2
+			overkill_req = 1.5
 		},
 	},
 	loc_vars = function(self,info_queue,card)
@@ -171,7 +237,7 @@ SMODS.Joker{
 	blueprint_compat = true,
 	eternal_compat = true,
 	perishable_compat = true,
-	pos = {x = 2, y = 0},
+	pos = {x = 3, y = 0},
 	config = {
 		extra = {
 			
@@ -185,7 +251,7 @@ SMODS.Joker{
 		if context.setting_blind then
 			G.E_MANAGER:add_event(Event({
 				func = function()
-					card.children.center:set_sprite_pos({x = 2, y = 0})
+					card.children.center:set_sprite_pos({x = 3, y = 0})
 					return true
 				end
 			}))
@@ -194,7 +260,7 @@ SMODS.Joker{
 		if context.final_scoring_step and context.cardarea == G.jokers and (hand_chips * mult >= G.GAME.blind.chips) and not context.blueprint and not context.retrigger_joker then
 			G.E_MANAGER:add_event(Event({
 				func = function()
-					card.children.center:set_sprite_pos({x = 2, y = 2})
+					card.children.center:set_sprite_pos({x = 3, y = 2})
 					return true
 				end
 			}))
@@ -225,7 +291,7 @@ SMODS.Joker{
 		if context.end_of_round and context.cardarea == G.jokers then
 			G.E_MANAGER:add_event(Event({
 				func = function()
-					card.children.center:set_sprite_pos({x = 2, y = 1})
+					card.children.center:set_sprite_pos({x = 3, y = 1})
 					return true
 				end
 			}))
@@ -236,6 +302,69 @@ SMODS.Joker{
 			}
 		end
 	end
+}
+
+SMODS.Joker{
+	key = 'micro_froggit',
+	loc_txt = {
+		name = 'Micro Froggit',
+		text = {
+		'{C:chips}+#1#{} Chips',
+		'{C:mult,E:2}Self destructs{}'
+		}
+	},
+	atlas = 'Ruins',
+	rarity = 1,
+	cost = 4,
+	unlocked = true,
+	discovered = true,
+	blueprint_compat = true,
+	eternal_compat = false,
+	perishable_compat = false,
+	pixel_size = { w = 9, h = 9 },
+	pos = {x = 4, y = 0},
+	config = {
+		extra = {
+			chips = 250
+		},
+	},
+	loc_vars = function(self,info_queue,card)
+        return {vars = { card.ability.extra.chips } }
+	end,
+	
+	calculate = function(self, card, context)
+		if context.joker_main then
+			SMODS.calculate_effect({chips = card.ability.extra.chips}, context.blueprint_card or card)
+			delay(0.5)
+			G.E_MANAGER:add_event(Event({
+				func = function()
+					play_sound('tarot1')
+					card.T.r = -0.2
+					card:juice_up(0.3, 0.4)
+					card.states.drag.is = true
+					card.children.center.pinch.x = true
+					G.E_MANAGER:add_event(Event({
+						trigger = 'after',
+						delay = 0.3,
+						blockable = false,
+						func = function()
+							G.jokers:remove_card(card)
+							card:remove()
+							card = nil
+							G.GAME.pool_flags.micro_froggit = false
+							G.GAME.pool_flags.macro_froggit = true
+							return true;
+						end
+					}))
+					return true
+				end
+			}))
+			return nil, true
+		end
+	end,
+	in_pool = function(self, args)
+        return (G.GAME.pool_flags.micro_froggit and not G.GAME.pool_flags.macro_froggit)
+    end
 }
 
 SMODS.Joker{
@@ -257,7 +386,7 @@ SMODS.Joker{
 	blueprint_compat = true,
 	eternal_compat = true,
 	perishable_compat = true,
-	pos = {x = 3, y = 0},
+	pos = {x = 0, y = 1},
 	config = {
 		extra = {
 			xmult = 4

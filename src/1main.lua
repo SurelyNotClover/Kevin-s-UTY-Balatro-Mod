@@ -232,27 +232,19 @@ else
 		end,
 		
 		calculate = function(self, card, context)
-			local ret1 = SMODS.blueprint_effect(card, G.flowey.cards[#G.flowey.cards-2], context)
-			local ret2 = SMODS.blueprint_effect(card, G.flowey.cards[#G.flowey.cards-1], context)
-			local ret3 = SMODS.blueprint_effect(card, G.flowey.cards[#G.flowey.cards], context)
-			if ret1 then
-				ret1.colour = G.C.UI.TEXT_INACTIVE
-				SMODS.calculate_effect(ret1, (not context.repetition and context.other_card) or card)
-			end
-			if ret2 then
-				ret2.colour = G.C.UI.TEXT_INACTIVE
-				SMODS.calculate_effect(ret2, (not context.repetition and context.other_card) or card)
-			end
-			if ret3 then
-				ret3.colour = G.C.UI.TEXT_INACTIVE
-				SMODS.calculate_effect(ret3, (not context.repetition and context.other_card) or card)
-			end
-	
-			--[[if context.setting_blind then
-				for k, v in pairs(G.flowey.cards) do
-					print(v.config.center_key)
+			local cards_to_process = { 
+				G.flowey.cards[#G.flowey.cards-2],
+				G.flowey.cards[#G.flowey.cards-1],
+				G.flowey.cards[#G.flowey.cards]
+			}
+		
+			for _, flowey_card in ipairs(cards_to_process) do
+				local ret = SMODS.blueprint_effect(card, flowey_card, context)
+				if ret then
+					ret.colour = G.C.UI.TEXT_INACTIVE
+					SMODS.calculate_effect(ret, (not context.repetition and context.other_card) or card)
 				end
-			end]]
+			end
 		end,
 	}
 
@@ -264,7 +256,7 @@ SMODS.Joker{
 		name = '',
 		text = {
 		'Mult - {C:mult}+8{} Mult',
-		'Bonus - {C:chips}+80{} Chips',
+		'Bonus - {C:chips}+60{} Chips',
 		'Glass - {C:green}1 in 8{} Chance',
 		'Steel - {X:mult,C:white}X2{} Mult',
 		'Stone - {C:chips}+100{} Chips',
@@ -280,40 +272,66 @@ SMODS.Joker{
 	pos = {x = 4, y = 4}
 }
 
-function edition_values(mult, bonus, glass, steel, stone, lucky_mult, lucky_money, gold, add_remove)
-	G.P_CENTERS.m_mult.config.mult = mult
-	G.P_CENTERS.m_bonus.config.bonus = bonus
-	G.P_CENTERS.m_glass.config.extra = glass
-	G.P_CENTERS.m_steel.config.h_x_mult = steel
-	G.P_CENTERS.m_stone.config.bonus = stone
-	G.P_CENTERS.m_lucky.config.mult = lucky_mult
-	G.P_CENTERS.m_lucky.config.extra.money_chance = lucky_money
-	-- had to lovely patch to change the chance
-	G.P_CENTERS.m_gold.config.h_dollars = gold
-	
-	if add_remove then
-		for i = 1, #G.playing_cards do
-			local card = G.playing_cards[i]
-			if card.ability then
-				if SMODS.has_enhancement(card, "m_mult") then
-					card.ability.mult = mult
-				elseif SMODS.has_enhancement(card, "m_bonus") then
-					card.ability.bonus = bonus
-				elseif SMODS.has_enhancement(card, "m_glass") then
-					card.ability.extra = glass
-				elseif SMODS.has_enhancement(card, "m_steel") then
-					card.ability.h_x_mult = steel
-				elseif SMODS.has_enhancement(card, "m_stone") then
-					card.ability.bonus = stone
-				elseif SMODS.has_enhancement(card, "m_lucky") then
-					card.ability.mult = lucky_mult
-					card.ability.extra.money_chance = lucky_money
-				elseif SMODS.has_enhancement(card, "m_gold") then
-					card.ability.h_dollars = gold
-				end
+function enchance_change(plus)
+	if plus then
+		G.P_CENTERS.m_mult.config.mult = 8
+		G.P_CENTERS.m_bonus.config.bonus = 60
+		G.P_CENTERS.m_glass.config.extra = 8
+		G.P_CENTERS.m_steel.config.h_x_mult = 2
+		G.P_CENTERS.m_stone.config.bonus = 100
+		G.P_CENTERS.m_lucky.config.mult = 30
+		G.P_CENTERS.m_lucky.config.extra.money_chance = 10
+		-- had to lovely patch to change the chance
+		G.P_CENTERS.m_gold.config.h_dollars = 6
+		G.GAME.mart_in_play = true
+	else
+		G.P_CENTERS.m_mult.config.mult = 4
+		G.P_CENTERS.m_bonus.config.bonus = 30
+		G.P_CENTERS.m_glass.config.extra = 4
+		G.P_CENTERS.m_steel.config.h_x_mult = 1.5
+		G.P_CENTERS.m_stone.config.bonus = 50
+		G.P_CENTERS.m_lucky.config.mult = 20
+		G.P_CENTERS.m_lucky.config.extra.money_chance = 15
+		G.P_CENTERS.m_gold.config.h_dollars = 3
+		G.GAME.mart_in_play = false
+	end
+
+	if G.playing_cards then
+		for k, card in pairs(G.playing_cards) do
+			if SMODS.has_enhancement(card, "m_mult") then
+				card.ability.mult = G.P_CENTERS.m_mult.config.mult
+			elseif SMODS.has_enhancement(card, "m_bonus") then
+				card.ability.bonus = G.P_CENTERS.m_bonus.config.bonus
+			elseif SMODS.has_enhancement(card, "m_glass") then
+				card.ability.extra = G.P_CENTERS.m_glass.config.extra
+			elseif SMODS.has_enhancement(card, "m_steel") then
+				card.ability.h_x_mult = G.P_CENTERS.m_steel.config.h_x_mult
+			elseif SMODS.has_enhancement(card, "m_stone") then
+				card.ability.bonus = G.P_CENTERS.m_stone.config.bonus
+			elseif SMODS.has_enhancement(card, "m_lucky") then
+				card.ability.mult = G.P_CENTERS.m_lucky.config.mult
+				card.ability.extra.money_chance = G.P_CENTERS.m_lucky.config.extra.money_chance
+			elseif SMODS.has_enhancement(card, "m_gold") then
+				card.ability.h_dollars = G.P_CENTERS.m_gold.config.h_dollars
 			end
 		end
 	end
+end
+
+local orig_main_menu = Game.main_menu
+function Game:main_menu(change_context)
+	if G.GAME.mart_in_play then
+		enchance_change(false)
+	end
+	orig_main_menu(self, change_context)
+end
+
+local orig_run_start = Game.start_run
+function Game:start_run(args)
+	if G.GAME.mart_in_play then
+		enchance_change(false)
+	end
+	orig_run_start(self, args)
 end
 
 SMODS.Joker {
@@ -336,25 +354,9 @@ SMODS.Joker {
 	pos = {x = 2, y = 0},
 	config = {
 		extra = {
-			mult = 8,
-			bonus = 80,
-			glass = 8,
-			steel = 2,
-			stone = 100,
-			lucky_mult = 30,
-			lucky_money = 10,
-			gold = 6,
-			
-			old_mult = 0,
-			old_bonus = 0,
-			old_glass = 0,
-			old_steel = 0,
-			old_stone = 0,
-			old_lucky_mult = 0,
-			old_lucky_money = 0,
-			old_gold = 0,
-			
-			in_build = false
+			flat = 2,
+			steel = 0.5,
+			lucky = 1.5,
 		}
 	},
 	loc_vars = function(self, info_queue, card)
@@ -365,45 +367,17 @@ SMODS.Joker {
 		return { vars = {  } }
 	end,
 	add_to_deck = function(self, card, from_debuff)
-
-		card.ability.extra.old_mult = G.P_CENTERS.m_mult.config.mult
-		card.ability.extra.old_bonus = G.P_CENTERS.m_bonus.config.bonus
-		card.ability.extra.old_glass = G.P_CENTERS.m_glass.config.extra
-		card.ability.extra.old_steel = G.P_CENTERS.m_steel.config.h_x_mult
-		card.ability.extra.old_stone = G.P_CENTERS.m_stone.config.bonus
-		card.ability.extra.old_lucky_mult = G.P_CENTERS.m_lucky.config.mult
-		card.ability.extra.old_lucky_money = G.P_CENTERS.m_lucky.config.extra.money_chance
-		card.ability.extra.old_gold = G.P_CENTERS.m_gold.config.h_dollars
-	
-		card.ability.extra.in_build = true
-		
-		edition_values(
-		card.ability.extra.mult, card.ability.extra.bonus, card.ability.extra.glass,
-		card.ability.extra.steel, card.ability.extra.stone, card.ability.extra.lucky_mult,
-		card.ability.extra.lucky_money, card.ability.extra.gold, true)
+		enchance_change(true)
 	end,
-	update = function(self, card, dt)
-		if card.ability.extra.in_build then
-			edition_values( 
-			card.ability.extra.mult, card.ability.extra.bonus, card.ability.extra.glass, 
-			card.ability.extra.steel, card.ability.extra.stone, card.ability.extra.lucky_mult,
-			card.ability.extra.lucky_money, card.ability.extra.gold)
-		end
+	update = function(self, card, from_debuff)
+		enchance_change(true)
 	end,
 	remove_from_deck = function(self, card, from_debuff)
-		card.ability.extra.in_build = false
-		edition_values( 
-		card.ability.extra.old_mult, card.ability.extra.old_bonus, card.ability.extra.old_glass, 
-		card.ability.extra.old_steel, card.ability.extra.old_stone, card.ability.extra.old_lucky_mult,
-		card.ability.extra.old_lucky_money, card.ability.extra.old_gold, true)
+		enchance_change(false)
 	end,
 	calculate = function(self, card, context)
-		if context.game_over then
-			card.ability.extra.in_build = false
-			edition_values( 
-			card.ability.extra.old_mult, card.ability.extra.old_bonus, card.ability.extra.old_glass, 
-			card.ability.extra.old_steel, card.ability.extra.old_stone, card.ability.extra.old_lucky_mult,
-			card.ability.extra.old_lucky_money, card.ability.extra.old_gold)
+		if context.gameover then
+			enchance_change(false)
 		end
 	end
 }
