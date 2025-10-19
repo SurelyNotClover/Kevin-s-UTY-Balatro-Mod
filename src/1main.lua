@@ -368,15 +368,20 @@ SMODS.Joker {
 	end,
 	add_to_deck = function(self, card, from_debuff)
 		enchance_change(true)
+		card.ability.extra.inBuild = true
 	end,
 	update = function(self, card, from_debuff)
-		enchance_change(true)
+		if card.ability.extra.inBuild then
+			enchance_change(true)
+		end 
 	end,
 	remove_from_deck = function(self, card, from_debuff)
+		card.ability.extra.inBuild = false
 		enchance_change(false)
 	end,
 	calculate = function(self, card, context)
 		if context.gameover then
+			card.ability.extra.inBuild = false
 			enchance_change(false)
 		end
 	end
@@ -525,4 +530,5 @@ SMODS.Joker{
 			return nil
 		end
 	end
+
 }
