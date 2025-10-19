@@ -34,8 +34,8 @@ SMODS.Joker{
         return {vars = { } }
 	end,
 
-	update = function(self, card, dt)
-		card.ability.extra.frame = card.ability.extra.frame + dt
+	draw = function(self, card, layer)
+		card.ability.extra.frame = card.ability.extra.frame + 0.25
 		card.children.floating_sprite:set_sprite_pos({x = 1 + math.floor(card.ability.extra.frame), y = 0})
 		if card.ability.extra.frame > 7 then
 			card.ability.extra.frame = 0
@@ -121,4 +121,5 @@ SMODS.Challenge({
 			{id = 'bl_final_leaf', type = 'blind'}
 		},
 	},
+
 })
