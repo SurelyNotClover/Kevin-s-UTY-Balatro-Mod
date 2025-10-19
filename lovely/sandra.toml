@@ -1,0 +1,65 @@
+[manifest]
+version = "1.0.0"
+dump_lua = true
+priority = -1
+
+# this patch adds repetitions for sandra
+
+[[patches]]
+[patches.pattern]
+target = 'card.lua'
+match_indent = true
+pattern = '''
+    SMODS.scale_card(self, {
+                    ref_table = self.ability,
+                    ref_value = "x_mult",
+                    scalar_value = "extra",
+                    message_key = 'a_xmult',
+                    message_colour = G.C.RED
+                })
+'''
+position = 'after'
+payload = '''
+    return nil, true
+'''
+
+[[patches]]
+[patches.pattern]
+target = 'card.lua'
+match_indent = true
+pattern = '''
+    SMODS.scale_card(self, {
+                        ref_table = self.ability,
+                        ref_value = "x_mult",
+                        scalar_value = "extra",
+                        operation = "-",
+                        message_key = 'a_xmult_minus',
+                        colour = G.C.RED
+                    })
+'''
+position = 'after'
+payload = '''
+    return nil, true
+'''
+
+[[patches]]
+[patches.pattern]
+target = 'card.lua'
+match_indent = true
+pattern = '''
+    SMODS.scale_card(self, {
+                        ref_table = self.ability,
+                        ref_value = "mult",
+                        scalar_table = self.ability.extra,
+                        scalar_value = "discard_sub",
+                        operation = function(ref_table, ref_value, initial, change)
+                            ref_table[ref_value] = math.max(0, initial - change)
+                        end,
+                        message_key = 'a_mult_minus',
+                        message_colour = G.C.RED
+                    })
+'''
+position = 'after'
+payload = '''
+    return nil, true
+'''
