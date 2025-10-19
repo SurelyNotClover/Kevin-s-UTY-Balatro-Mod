@@ -484,29 +484,6 @@ jd_def["j_sncuty_violleta"] = {
     end
 }
 
-jd_def["j_sncuty_sandra"] = {
-    text = {
-        { text = "+" },
-        { ref_table = "card.joker_display_values", ref_value = "discards" },
-        { text = " / " },
-        { text = "+" },
-        { ref_table = "card.joker_display_values", ref_value = "hands" },
-    },
-    calc_function = function(card)
-        card.joker_display_values.discards = (card.ability.extra.discard_bonus and card.ability.extra.extra_discards) or 0
-        card.joker_display_values.hands = (card.ability.extra.hand_bonus and card.ability.extra.extra_hands) or 0
-    end,
-    style_function = function(card, text, reminder_text, extra)
-        if text and text.children[1] and text.children[2] and text.children[4] and text.children[5] then
-            text.children[1].config.colour = G.C.MULT
-            text.children[2].config.colour = G.C.MULT
-            text.children[4].config.colour = G.C.CHIPS
-            text.children[5].config.colour = G.C.CHIPS
-        end
-        return false
-    end
-}
-
 jd_def["j_sncuty_fortune_teller"] = {
     text = {
         { ref_table = "card.joker_display_values", ref_value = "odds" },
@@ -756,4 +733,5 @@ jd_def["j_sncuty_manta_bot"] = {
         { ref_table = "card.ability.extra", ref_value = "mult" }
     },
     text_config = { colour = G.C.MULT }
+
 }
