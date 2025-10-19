@@ -569,16 +569,25 @@ SMODS.Joker{
 	end
 }
 
+local oldcalcseal = Card.calculate_seal
+function Card:calculate_seal(context)
+    local g, post = oldcalcseal(self, context)
+    if (g or post) and context.discard then
+        for i, v in ipairs(SMODS.find_card('j_sncuty_sandra')) do
+            SMODS.calculate_effect({message = localize('k_again_ex')}, v)
+            local _, postpost = oldcalcseal(self, context)
+            post = post or postpost
+        end
+    end
+    return g, post
+end
+
 SMODS.Joker{
 	key = 'sandra',
 	loc_txt = {
 		name = 'Sandra',
 		text = {
-		'If {C:attention}Blind{} was beaten without using',
-		'Discards, {C:mult}+#1#{} Discards next round',
-		'If {C:attention}Blind{} was beaten in {C:attention}1{} Hand,',
-		'{C:chips}+#2#{} Hand next round',
-		'{C:inactive}(Currently: {C:mult}#3#{C:inactive}; {C:chips}#4#{C:inactive})'
+		'Retriggers {C:mult}Discard{} effects once'
 		}
 	},
 	atlas = 'Dunes',
@@ -592,6 +601,7 @@ SMODS.Joker{
 	pos = {x = 2, y = 2},
 	config = {
 		extra = {
+			repetitions = 1,
 			extra_discards = 2,
 			extra_hands = 1,
 			discard_bonus = false,
@@ -599,32 +609,14 @@ SMODS.Joker{
 		},
 	},
 	loc_vars = function(self,info_queue,card)
-        return {vars = { card.ability.extra.extra_discards, card.ability.extra.extra_hands, (card.ability.extra.discard_bonus and "Active") or 'Inactive', (card.ability.extra.hand_bonus and "Active") or 'Inactive' } }
+        return {vars = {  }}
 	end,
 	calculate = function(self, card, context)
-		if context.end_of_round and context.cardarea == G.jokers and context.main_eval and not (context.blueprint or context.retrigger_joker) then
-			if G.GAME.current_round.hands_played == 1 then
-				card.ability.extra.hand_bonus = true
-				SMODS.calculate_effect({message = 'Recycling!'}, card)
-			end
-			if G.GAME.current_round.discards_used == 0 then
-				card.ability.extra.discard_bonus = true
-				if not G.GAME.current_round.hands_played == 1 then
-					SMODS.calculate_effect({message = 'Recycling!'}, card)
-				end
-			end
-		end
-		if context.setting_blind then
-			if card.ability.extra.hand_bonus then
-				ease_hands_played(card.ability.extra.extra_hands)
-				card.ability.extra.hand_bonus = false
-				SMODS.calculate_effect({message = '+'..card.ability.extra.extra_hands..' Hand', colour = G.C.CHIPS}, card)
-			end
-			if card.ability.extra.discard_bonus then
-				ease_discard(card.ability.extra.extra_discards)
-				card.ability.extra.discard_bonus = false
-				SMODS.calculate_effect({message = '+'..card.ability.extra.extra_discards..' Discards', colour = G.C.MULT}, card)
-			end
+		if context.retrigger_joker_check and not context.retrigger_joker and context.other_card ~= self and context.other_context.discard then
+			SMODS.calculate_effect({message = 'Again!'}, card)
+			return {
+				repetitions = card.ability.extra.repetitions,
+			}
 		end
 	end,
 }
@@ -1196,4 +1188,5 @@ SMODS.Joker{
 			SMODS.calculate_effect({ message = "Reset", colour = G.C.RED }, card)
 		end
 	end
+
 }
