@@ -346,6 +346,8 @@ end
 
 --CHANGE LOG--
 
+-- 2.0
+
 balance
 
 - tweaked mo (-10$ -> -6$, +15$ -> +10$)
@@ -373,11 +375,20 @@ other
 - took off kevin's beanie
 - rewritten martlet
 
+-- 2.1
+
+balance
+
+- changed sandra
+
+other
+
+- kevin's now animated in the collection
+- martlet works now (for real)
+
 -----TODO:----- 
 
 0 - top-priority:
-investigate multiplayer calculator compatibility (https://www.twitch.tv/videos/2564357377?t=2h59m16s)
-finish martlet (done?)
 unjank flowey (specifically context.repetition (only triggering message) and context.individual (triggering before the card)) (soft fix in a form of an old Flowey)
 
 0 - mid-priority:
@@ -390,5 +401,6 @@ fix Pedla soft-locking if retriggered too much (fixed?)
 redraw Jandroid, Penilla
 redraw backgrounds Honey, Blackjack
 add JokerDisplay compatibility for Pops
+
 
 ]]
