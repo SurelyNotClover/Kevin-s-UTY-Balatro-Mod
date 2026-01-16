@@ -1,5 +1,8 @@
 # Kevin's Undertale Yellow
 
+# NOTE: might not work on the latest steammodded version.
+i'll get to it when i'll get to it
+
 !! V2 UPDATE !!
 
 10 new jokers and balance changes
