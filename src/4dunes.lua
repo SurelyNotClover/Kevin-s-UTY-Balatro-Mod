@@ -582,6 +582,21 @@ function Card:calculate_seal(context)
     return g, post
 end
 
+local oldcalcjoke = Card.calculate_joker
+function Card:calculate_joker(context)
+    local g, post = oldcalcjoke(self, context)
+    if (g or post) and (context.discard or context.pre_discard) then
+        for i, v in ipairs(SMODS.find_card('j_sncuty_sandra')) do
+            if not self.ability.name == 'Yorick' then
+				SMODS.calculate_effect({message = localize('k_again_ex')}, v)
+			end
+            local _, postpost = oldcalcjoke(self, context)
+            post = post or postpost
+        end
+    end
+    return g, post
+end
+
 SMODS.Joker{
 	key = 'sandra',
 	loc_txt = {
@@ -599,26 +614,6 @@ SMODS.Joker{
 	eternal_compat = true,
 	perishable_compat = true,
 	pos = {x = 2, y = 2},
-	config = {
-		extra = {
-			repetitions = 1,
-			extra_discards = 2,
-			extra_hands = 1,
-			discard_bonus = false,
-			hand_bonus = false
-		},
-	},
-	loc_vars = function(self,info_queue,card)
-        return {vars = {  }}
-	end,
-	calculate = function(self, card, context)
-		if context.retrigger_joker_check and not context.retrigger_joker and context.other_card ~= self and context.other_context.discard then
-			SMODS.calculate_effect({message = 'Again!'}, card)
-			return {
-				repetitions = card.ability.extra.repetitions,
-			}
-		end
-	end,
 }
 
 SMODS.Joker{
@@ -1190,3 +1185,4 @@ SMODS.Joker{
 	end
 
 }
+
